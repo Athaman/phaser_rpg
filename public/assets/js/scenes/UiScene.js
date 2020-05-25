@@ -3,6 +3,11 @@ class UiScene extends Phaser.Scene {
     super('Ui');
   }
 
+  init() {
+    // grab game scene reference
+    this.gameScene = this.scene.get('Game');
+  }
+
   create() {
     this.setupUiElements();
     this.setupEvents();
@@ -17,5 +22,9 @@ class UiScene extends Phaser.Scene {
     this.coinIcon = this.add.image(15, 15, 'items', 3);
   }
 
-  setupEvents() {}
+  setupEvents() {
+    this.gameScene.events.on('updatescore', (score) => {
+      this.scoreText.setText(`Coins: ${score}`);
+    });
+  }
 }
