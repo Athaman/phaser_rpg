@@ -5,6 +5,7 @@ class GameScene extends Phaser.Scene {
 
   init() {
     this.scene.launch('Ui');
+    this.score = 0;
   }
 
   preload() {}
@@ -27,12 +28,6 @@ class GameScene extends Phaser.Scene {
     this.player.update(this.cursors);
   }
 
-  collectChest(_player, chest) {
-    this.goldPickupAudio.play();
-    this.events.emit('updatescore', chest.coins);
-    chest.destroy();
-  }
-
   createAudio() {
     this.goldPickupAudio = this.sound.add('goldSound', {
       loop: false,
@@ -41,7 +36,34 @@ class GameScene extends Phaser.Scene {
   }
 
   createChests() {
-    this.chest = new Chest(this, 300, 300, 'items', 0);
+    this.chests = this.physics.add.group();
+    this.maxNumberOfChests = 3;
+    this.chestPositions = [
+      [100, 100],
+      [200, 200],
+      [300, 300],
+      [400, 400],
+      [500, 500],
+    ];
+    for (let i = 0; i < this.maxNumberOfChests; i++) {
+      this.spawnChest();
+    }
+  }
+
+  collectChest(_player, chest) {
+    this.goldPickupAudio.play();
+    this.score += chest.coins;
+    this.events.emit('updatescore', this.score);
+    chest.destroy();
+    this.time.delayedCall(1000, this.spawnChest, [], this);
+  }
+
+  spawnChest() {
+    const location = this.chestPositions[
+      Math.floor(Math.random() * this.chestPositions.length)
+    ];
+    const chest = new Chest(this, location[0], location[1], 'items', 0);
+    this.chests.add(chest);
   }
 
   createPlayer() {
@@ -57,7 +79,7 @@ class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.wall);
     this.physics.add.overlap(
       this.player,
-      this.chest,
+      this.chests,
       this.collectChest,
       null,
       this
