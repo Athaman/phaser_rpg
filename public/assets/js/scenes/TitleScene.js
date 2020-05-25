@@ -26,10 +26,9 @@ class TitleScene extends Phaser.Scene {
       'button2',
       'Start',
       this.startScene.bind(this, 'Game')
-    ); // NEW
+    );
   }
 
-  // NEW function:
   startScene(targetScene) {
     this.scene.start(targetScene);
   }
